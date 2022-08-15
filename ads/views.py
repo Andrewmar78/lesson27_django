@@ -5,7 +5,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView
 
-from app.models import Category, Ads
+from ads.models import Category, Ad
 
 
 def hello(request):
@@ -18,6 +18,8 @@ class CategoryView(View):
         categories = Category.objects.all()
         search_text = request.GET.get("Котики", None)
         if search_text:
+            categories = categories.filter(name=search_text)
+
             response = []
             for category in categories:
                 response.append({"id": category.id,
@@ -32,9 +34,10 @@ class CategoryView(View):
 
         category.save()
 
-        return JsonResponse({"id": category.id,
-                             "name": category.name,
-                             })
+        return JsonResponse({
+            "id": category.id,
+            "name": category.name,
+            })
 
 
 class CategoryDetailView(DetailView):
@@ -50,24 +53,25 @@ class CategoryDetailView(DetailView):
 @method_decorator(csrf_exempt, name="dispatch")
 class AdView(View):
     def get(self, request):
-        ads = Ads.objects.all()
+        ads = Ad.objects.all()
         search_text = request.GET.get("котята", None)
+        ads = ads.filter(description=search_text)
         if search_text:
             response = []
             for ad in ads:
-                response.append({"id": ads.id,
-                                 "name": ads.name,
-                                 "author": ads.author,
-                                 "price": ads.price,
-                                 "description": ads.description,
-                                 "address": ads.address,
-                                 "is_published": ads.is_published,
+                response.append({"id": ad.id,
+                                 "name": ad.name,
+                                 "author": ad.author,
+                                 "price": ad.price,
+                                 "description": ad.description,
+                                 "address": ad.address,
+                                 "is_published": ad.is_published,
                                  })
             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
     def post(self, request):
         ad_data = json.loads(request.body)
-        ad = Ads()
+        ad = Ad()
         ad.name = ad_data["name"]
         ad.author = ad_data["author"]
         ad.price = ad_data["price"]
@@ -88,7 +92,7 @@ class AdView(View):
 
 
 class AdDetailView(DetailView):
-    model = Ads
+    model = Ad
 
     def get(self, request, *args, **kwargs):
         ad = self.get_object()

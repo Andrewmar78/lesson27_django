@@ -16,7 +16,7 @@ def csv_to_json(csv_file, json_file):
             # print(row)
 
     with open(json_file, 'w', encoding="utf-8") as outfile:
-        outfile.write(json.dumps(json_list, ensure_ascii=False))
+        outfile.write(json.dumps(json_list, ensure_ascii=False, indent=4))
 
 
 csv_to_json(CSV_PATH_1, JSON_PATH_1)
