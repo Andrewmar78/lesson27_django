@@ -1,4 +1,5 @@
 import json
+
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -11,14 +12,25 @@ from ads.models import Category, Ad
 def hello(request):
     return JsonResponse({"status": "ok"})
 
+# Функция работает корректно
+# def index(request):
+#     if request.method == "GET":
+#         categories = Category.objects.all()
+#         response = []
+#         for category in categories:
+#             response.append({"id": category.id,
+#                              "name": category.name
+#                              })
+#         return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class CategoryView(View):
     def get(self, request):
         categories = Category.objects.all()
-        search_text = request.GET.get("Котики", None)
-        if search_text:
-            categories = categories.filter(name=search_text)
+        category_search = request.GET.get("name", None)
+        if category_search:
+            categories = categories.filter(name=category_search)
 
             response = []
             for category in categories:
@@ -28,6 +40,7 @@ class CategoryView(View):
             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
     def post(self, request):
+        # работает
         category_data = json.loads(request.body)
         category = Category()
         category.name = category_data["name"]
@@ -41,6 +54,7 @@ class CategoryView(View):
 
 
 class CategoryDetailView(DetailView):
+    # Работает
     model = Category
 
     def get(self, request, *args, **kwargs):
@@ -54,9 +68,10 @@ class CategoryDetailView(DetailView):
 class AdView(View):
     def get(self, request):
         ads = Ad.objects.all()
-        search_text = request.GET.get("котята", None)
-        ads = ads.filter(description=search_text)
-        if search_text:
+        ad_search = request.GET.get("Павел", None)
+        if ad_search:
+            ads = ads.filter(name=ad_search)
+
             response = []
             for ad in ads:
                 response.append({"id": ad.id,
@@ -70,6 +85,7 @@ class AdView(View):
             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
     def post(self, request):
+        # работает
         ad_data = json.loads(request.body)
         ad = Ad()
         ad.name = ad_data["name"]
@@ -104,3 +120,4 @@ class AdDetailView(DetailView):
                              "address": ad.address,
                              "is_published": ad.is_published,
                              })
+

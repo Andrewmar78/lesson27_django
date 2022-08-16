@@ -10,12 +10,13 @@ class Ad(models.Model):
     # slag = models.SlugField(max_length=50)
     # status = models.CharField(max_length=6, choices=STATUS, default="draft")
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="Anonymous")
     author = models.CharField(max_length=2000)
-    price = models.IntegerField()
+    price = models.CharField(max_length=20)
     description = models.CharField(max_length=2000)
     address = models.CharField(max_length=200)
-    is_published = models.DateField(auto_now_add=True)
+    is_published = models.CharField(max_length=20)
+    # is_published = models.DateField(auto_now_add=True)
 
 
 class Category(models.Model):
