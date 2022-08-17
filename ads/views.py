@@ -29,10 +29,17 @@ class CategoryView(View):
     def get(self, request):
         categories = Category.objects.all()
         category_search = request.GET.get("name", None)
+        response = []
+
         if category_search:
             categories = categories.filter(name=category_search)
+            for category in categories:
+                response.append({"id": category.id,
+                                 "name": category.name
+                                 })
+            return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
-            response = []
+        elif category_search is None:
             for category in categories:
                 response.append({"id": category.id,
                                  "name": category.name
@@ -40,7 +47,6 @@ class CategoryView(View):
             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
     def post(self, request):
-        # работает
         category_data = json.loads(request.body)
         category = Category()
         category.name = category_data["name"]
@@ -68,11 +74,23 @@ class CategoryDetailView(DetailView):
 class AdView(View):
     def get(self, request):
         ads = Ad.objects.all()
-        ad_search = request.GET.get("Павел", None)
-        if ad_search:
-            ads = ads.filter(name=ad_search)
+        ad_search = request.GET.get("author", None)
+        response = []
 
-            response = []
+        if ad_search:
+            ads = ads.filter(author=ad_search)
+            for ad in ads:
+                response.append({"id": ad.id,
+                                 "name": ad.name,
+                                 "author": ad.author,
+                                 "price": ad.price,
+                                 "description": ad.description,
+                                 "address": ad.address,
+                                 "is_published": ad.is_published,
+                                 })
+            return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
+
+        elif ad_search is None:
             for ad in ads:
                 response.append({"id": ad.id,
                                  "name": ad.name,
@@ -85,7 +103,6 @@ class AdView(View):
             return JsonResponse(response, safe=False, json_dumps_params={"ensure_ascii": False})
 
     def post(self, request):
-        # работает
         ad_data = json.loads(request.body)
         ad = Ad()
         ad.name = ad_data["name"]
